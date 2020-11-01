@@ -1,3 +1,18 @@
+
+function Autobind(_: any, _2: string, propertyDescriptor: PropertyDescriptor) {
+    const orginalMethod = propertyDescriptor.value;
+    const adjDescriptor: PropertyDescriptor = {
+        configurable: true,
+        get() {
+            const boundFn = orginalMethod.bind(this);
+            return boundFn;
+        }
+    }
+
+    return adjDescriptor;
+}
+
+
 class ProjectInput {
     templateElement: HTMLTemplateElement;
     hostElement: HTMLDivElement;
@@ -21,6 +36,7 @@ class ProjectInput {
         this.attach();
     }
 
+    @Autobind
     private submitHandler(event: Event) {
         event.preventDefault(); //would trigger htttp event
 
@@ -28,7 +44,7 @@ class ProjectInput {
     }
 
     private configure() {
-        this.element.addEventListener('submit', this.submitHandler.bind(this));
+        this.element.addEventListener('submit', this.submitHandler);
 
     }
 
