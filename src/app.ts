@@ -157,8 +157,11 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements 
 
     @Autobind
     dragStartHandler(event: DragEvent): void {
-        console.log(event);
+        event.dataTransfer!.setData('text/plain', this.project.id);
+        event.dataTransfer!.effectAllowed = 'move';
     }
+
+    @Autobind
     dragEndHandler(_: DragEvent): void {
         console.log('dragend');
     }
@@ -174,7 +177,7 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements 
     }
 }
 
-class ProjectList extends Component<HTMLDivElement, HTMLElement>{
+class ProjectList extends Component<HTMLDivElement, HTMLElement> implements DropTarget {
     assignedProjects: Project[];
 
     constructor(private type: 'active' | 'finished') {
@@ -183,6 +186,26 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>{
 
         this.configure();
         this.renderContent();
+    }
+
+    @Autobind
+    dragOverHandler(event: DragEvent): void {
+        if (event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
+            event.preventDefault(); //allow drop
+            const listEl = this.element.querySelector('ul')!;
+            listEl.classList.add('droppable');
+        }
+    }
+
+    @Autobind
+    dragLeaveHandler(_: DragEvent): void {
+        const listEl = this.element.querySelector('ul')!;
+        listEl.classList.remove('droppable');
+    }
+
+    @Autobind
+    dropHandler(event: DragEvent): void {
+        console.log(event.dataTransfer!.getData('text/plain'));
     }
 
     private renderProjects() {
@@ -194,6 +217,10 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>{
     }
 
     configure() {
+        this.element.addEventListener('dragover', this.dragOverHandler);
+        this.element.addEventListener('dragleave', this.dragLeaveHandler);
+        this.element.addEventListener('drop', this.dropHandler);
+
         projectstate.addListener((projects:Project[]) => {
             this.assignedProjects = projects.filter(project => {
                 if (this.type === 'active') {
