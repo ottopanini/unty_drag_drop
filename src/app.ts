@@ -63,6 +63,14 @@ class ProjectState extends State<Project> {
         this.projects.push(newProject);
         this.submit(this.projects);
     }
+
+    moveProject(id: string, newStatus: ProjectStatus) {
+        let project = this.projects.find(project => project.id === id);
+        if (project && project.status !== newStatus) {
+            project.status = newStatus;
+            this.submit(this.projects);
+        }
+    }
 }
 
 const projectstate = ProjectState.getInstance();
@@ -205,7 +213,10 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drop
 
     @Autobind
     dropHandler(event: DragEvent): void {
-        console.log(event.dataTransfer!.getData('text/plain'));
+        let projectId = event.dataTransfer!.getData('text/plain');
+        projectstate.moveProject(projectId, this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Finished);
+        const listEl = this.element.querySelector('ul')!;
+        listEl.classList.remove('droppable');
     }
 
     private renderProjects() {
