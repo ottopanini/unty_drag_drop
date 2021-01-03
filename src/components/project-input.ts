@@ -1,9 +1,9 @@
-import {Component} from "./base-component.js";
-import {Autobind} from "../decorators/autobind.js";
-import {isValid, Validatable} from "../util/validation.js";
+import Cmp from "./base-component.js";
+import { Autobind as autobind } from "../decorators/autobind.js";
+import * as Validation from "../util/validation.js";
 import {projectstate} from "../state/project-state.js";
 
-export class ProjectInput extends Component<HTMLDivElement, HTMLInputElement>{
+export class ProjectInput extends Cmp<HTMLDivElement, HTMLInputElement>{
     titleInputElement: HTMLInputElement;
     descriptionInputElement: HTMLInputElement;
     peopleInputElement: HTMLInputElement;
@@ -24,18 +24,18 @@ export class ProjectInput extends Component<HTMLDivElement, HTMLInputElement>{
         const enteredDesription = this.descriptionInputElement.value;
         const enteredPeople = this.peopleInputElement.value;
 
-        const titleValidatable: Validatable = {
+        const titleValidatable: Validation.Validatable = {
             value: enteredTitle, required: true, minLength: 5
         };
-        const descriptionValidatable: Validatable = {
+        const descriptionValidatable: Validation.Validatable = {
             value: enteredDesription, required: true, minLength: 5
         };
-        const numberValidatable: Validatable = {
+        const numberValidatable: Validation.Validatable = {
             value: enteredPeople, required: true, min: 1, max: 5
         };
-        if (!isValid(titleValidatable) ||
-            !isValid(descriptionValidatable) ||
-            !isValid(numberValidatable)) {
+        if (!Validation.isValid(titleValidatable) ||
+            !Validation.isValid(descriptionValidatable) ||
+            !Validation.isValid(numberValidatable)) {
             alert('invalid input, please try again');
             return;
         } else {
@@ -49,7 +49,7 @@ export class ProjectInput extends Component<HTMLDivElement, HTMLInputElement>{
         this.peopleInputElement.value = '';
     }
 
-    @Autobind
+    @autobind
     private submitHandler(event: Event) {
         event.preventDefault(); //would trigger htttp event
 
